@@ -172,6 +172,27 @@
       </v-menu>
     </v-col>
   </v-row>
+  
+    <v-banner
+      v-model="v0"
+      single-line
+      transition="slide-y-transition"
+      font:
+    >
+      Escriba una descripcion del servicio:
+
+    </v-banner>
+    <v-col col=6>
+
+    <v-text-field
+            v-model="Descripcion"
+            :rules="nameRules"
+            :counter="10"
+            label="Descripcion"
+            required
+          ></v-text-field>
+    </v-col>
+
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
