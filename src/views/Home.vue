@@ -6,13 +6,29 @@
       col="12"
       md="6"
     >
-          <v-text-field
-      label="Buscar Profesional"
-      :rules="rules"
-      hide-details="auto"
-      color="black"
-    ></v-text-field>
-
+      <v-form>
+        <v-row>
+          <v-col cols="12"
+          md="10">
+            <v-text-field
+            label="Buscar Profesional"
+            :rules="rules"
+            hide-details="auto"
+            color="black"
+          ></v-text-field>
+          </v-col>
+          <v-col cols="12"
+          md="2"
+            class="d-flex align-center"
+          >
+            <v-btn
+              @click="buscar"
+            >
+            Buscar
+            </v-btn>  
+          </v-col>
+        </v-row>
+      </v-form>
     </v-col>
     </v-contianer>
   </div>
@@ -26,6 +42,11 @@
     name: 'Home',
     components:{
       Navegacion,
+    },
+    methods:{
+      buscar: function(){
+        alert("buscando")
+      }
     }
   }
 </script>

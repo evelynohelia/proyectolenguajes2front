@@ -6,7 +6,7 @@
         <v-spacer/>
         <v-btn href="/profile" color="yellow" elevation="0">
         <div class="headline d-flex align-center">
-            <h5 class="mr-4">Profile</h5>       
+            <h5 class="mr-4">Perfil</h5>       
             <v-icon
             left
             large
