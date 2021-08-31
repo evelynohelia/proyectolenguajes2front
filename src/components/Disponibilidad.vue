@@ -7,8 +7,9 @@
       <v-col
         cols="6"
         sm="6"
+        
       >
-      Disponibilidad
+      <h3>Disponibilidad</h3>
       </v-col>
       <v-col
         cols="6"
@@ -27,7 +28,7 @@
           v-bind="attrs"
           v-on="on"
         >
-          Open Dialog
+          Agregar Turno
         </v-btn>
       </template>
       <v-card>
@@ -36,7 +37,7 @@
         </v-card-title>
         <v-card-text>
           <v-container>
-            <v-row>
+            
               
               <v-banner
       v-model="v0"
@@ -49,7 +50,7 @@
     </v-banner>
     
 
-            </v-row>
+            
           </v-container>
                 <v-menu
         ref="menudate"
@@ -196,9 +197,73 @@
 
 
     </v-row>
-        
+  <!--aqui termia la parte de arriba del componente-->
+  <v-space></v-space>
+  <h4 class= "cabecerad">Dias disponibles</h4> 
+
     
+      <v-card height="15rem"
+      class="diascard"
+      elevation="2"
+    >
+
+
+    <v-card-text class="scroller">
+      <v-row  v-for="turno in turnos" :key="turno.dia" align="center"
+      justify="center">
+        <v-col col=12 sm=2>
+          <v-card><h3 class="dia">{{turno.dia}}</h3></v-card>
+        </v-col>
+        <v-col col=12 sm=3 md=3>
+
+          <v-card><h3 class="dia">Hora inicio:{{turno.horaini}}</h3></v-card>
+          
+        </v-col>
+        <v-col col=12 sm=3 md=3>
+
+          <v-card><h3 class="dia">Hora inicio:{{turno.horafin}}</h3></v-card>
+          
+        </v-col>
+        <v-col col=12 sm=3 md=3>
+
+          <v-btn
+          color="blue lighten-5"
+          dark
+          v-bind="attrs"
+          v-on="on"
+          align:center
+        >
+          <p class="eliminar">Eliminar turno</p>
+        </v-btn>
+          
+        </v-col>
+
+          
+          
+        
+
+
+        
+      </v-row>
+      </v-card-text>
+      
+    </v-card>
+    
+
+
+
+
+
   </v-container>
+
+  
+
+
+
+
+
+
+
 
   </section>
 
@@ -224,6 +289,66 @@
         menu2: false,
         menu3:false,
         modal2: false,
+        turnos:[
+          {
+          dia:"Lunes",
+          horaini:"19:30",
+          horafin:"20:00"
+          },
+          {
+          dia:"Martes",
+          horaini:"19:30",
+          horafin:"20:00"
+          },{
+          dia:"Miercoles",
+          horaini:"19:30",
+          horafin:"20:00"
+          },{
+          dia:"Jueves",
+          horaini:"19:30",
+          horafin:"20:00"
+          },{
+          dia:"Viernes",
+          horaini:"19:30",
+          horafin:"20:00"
+          },{
+          dia:"Sabado",
+          horaini:"19:30",
+          horafin:"20:00"
+          },{
+          dia:"Domingo",
+          horaini:"19:30",
+          horafin:"20:00"
+          },{
+           dia:"Lunes",
+          horaini:"7:30",
+          horafin:"8:00"
+          },
+          {
+          dia:"Martes",
+          horaini:"7:30",
+          horafin:"8:00"
+          },
+          {
+          dia:"Miercoles",
+          horaini:"7:30",
+          horafin:"8:00"
+          },{
+          dia:"Lunes",
+          horaini:"8:30",
+          horafin:"9:00"
+          },
+          {
+          dia:"Martes",
+          horaini:"9:30",
+          horafin:"9:00"
+          },
+          {
+          dia:"Miercoles",
+          horaini:"8:30",
+          horafin:"9:00"
+          },
+        ],
     }),
     methods: {
 
@@ -240,5 +365,27 @@
   .Disponibilidad {
 
   }
+  .cabecerad{
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+  .dia{
+    text-align: center;
+  }
+  .eliminar{
+    color:black;
+  }
+  .diascard{
+    display: flex !important;
+  flex-direction: column;
+    
+  }
+  .scroller{
+    flex-grow: 1;
+    overflow: auto;
+  }
+  html {
+  overflow: hidden !important;
+}
   
 </style>
