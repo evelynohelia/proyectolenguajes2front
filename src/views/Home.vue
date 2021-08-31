@@ -1,6 +1,7 @@
 <template>
   <div class="root">
     <Navegacion></Navegacion>
+    <Disponibilidad></Disponibilidad>
     <v-contianer class="d-flex justify-center mt-5">
           <v-col
       col="12"
@@ -22,10 +23,12 @@
 <script>
 
   import Navegacion from '../components/Navegacion.vue';
+  import Disponibilidad from '../components/Disponibilidad.vue';
   export default {
     name: 'Home',
     components:{
       Navegacion,
+      Disponibilidad,
     }
   }
 </script>
