@@ -1,9 +1,9 @@
 <template lang="html">
 
   <section class="Disponibilidad">
-    <h1>Disponibilidad Component</h1>
-    <v-container class="grey lighten-5">
-    <v-row no-gutters>
+    
+    <v-container class="grey lighten-5" >
+    <v-row no-gutters >
       <v-col
         cols="6"
         sm="6"
