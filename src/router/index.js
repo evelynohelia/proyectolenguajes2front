@@ -32,6 +32,14 @@ const routes = [
     path:'/profesional',
     name: 'Profesional',
     component : () => import(/* webpackChunkName: "about"*/'../views/Profesional.vue')
+  },
+  {
+    path:'/historial/:id',
+    name: 'historial',
+    component : () => import(/* webpackChunkName: "about"*/'../views/Historial.vue'),
+    props: {
+      default: true
+    }
   }
 ]
 
