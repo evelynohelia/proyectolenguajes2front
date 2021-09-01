@@ -1,7 +1,7 @@
 <template>
   <div class="root">
     <Navegacion></Navegacion>
-    <v-contianer class="d-flex justify-center mt-5">
+    <v-container class="d-flex justify-center mt-5">
           <v-col
       col="12"
       md="6"
@@ -12,7 +12,6 @@
           md="10">
             <v-text-field
             label="Buscar Profesional"
-            :rules="rules"
             hide-details="auto"
             color="black"
           ></v-text-field>
@@ -30,24 +29,48 @@
         </v-row>
       </v-form>
     </v-col>
-    </v-contianer>
+    </v-container>
+    <v-container class="mt-5">
+      <v-row v-if="load">
+      
+        <ProfCard v-for="prof in profesionales" v-bind:profesional="prof" v-bind:key="prof.persona_id">
+
+        </ProfCard>
+      </v-row>
+    </v-container>
   </div>
-  
 </template>
 
 <script>
 
   import Navegacion from '../components/Navegacion.vue';
+  import ProfCard from '../components/ProfCard.vue';
+  import axios from 'axios';
   export default {
     name: 'Home',
     components:{
       Navegacion,
+      ProfCard
     },
     methods:{
       buscar: function(){
         alert("buscando")
       }
+    },
+    data(){
+      return{
+          profesionales: [],
+          load : false
+      }
+    },
+    mounted(){
+        axios.get("http://localhost:8000/api/profRecomendados").then(response => {
+          this.profesionales = response.data;
+          console.log(this.profesionales)
+          this.load = true;
+        })
     }
+
   }
 </script>
 

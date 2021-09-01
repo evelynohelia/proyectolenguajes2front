@@ -29,7 +29,7 @@ const routes = [
     component : () => import(/* webpackChunkName: "about"*/'../views/Profile.vue')
   },
   {
-    path:'/profesional',
+    path:'/profesional/:id',
     name: 'Profesional',
     component : () => import(/* webpackChunkName: "about"*/'../views/Profesional.vue')
   }
