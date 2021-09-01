@@ -296,79 +296,83 @@
 <script lang="js">
 
   export default  {
+    
     name: 'Disponibilidad',
     props: [],
     mounted () {
+      const axios = require('axios').default;
+      axios
+      .get('http://127.0.0.1:8000/api/turno')
+      .then(response => {
+        let listadias=[];
+        let days = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'];
+        console.log(response.data)
+        if(Array.isArray(response.data)){
+          response.data.forEach(element => {
+          let fechaini=new Date();
+          fechaini.setTime(Date.parse(element.fecha_inicio));
+          let fechafin=new Date()
+          fechafin.setTime(Date.parse(element.fecha_fin));
+          let horasini=fechaini.getHours();
+          let minutoini1=fechaini.getMinutes();
+          let horaini1=""+horasini+":"+minutoini1;
+          let horasfin=fechafin.getHours();
+          let minutofin1=fechafin.getMinutes();
+          let horafin1=""+horasfin+":"+minutofin1;
+          let dayName = days[fechaini.getDay()];
+          let dia={
+            dia:dayName,
+            horaini: horaini1,
+            horafin:horafin1
+          }
+          
+          listadias.push(dia)
 
+        }
+        );
+        }
+        else{
+          let element=response.data
+          let fechaini=new Date();
+          fechaini.setTime(Date.parse(element.fecha_inicio));
+          let fechafin=new Date()
+          fechafin.setTime(Date.parse(element.fecha_fin));
+          let horasini=fechaini.getHours();
+          let minutoini1=fechaini.getMinutes();
+          let horaini1=""+horasini+":"+minutoini1;
+          let horasfin=fechafin.getHours();
+          let minutofin1=fechafin.getMinutes();
+          let horafin1=""+horasfin+":"+minutofin1;
+          let dayName = days[fechaini.getDay()];
+          let dia={
+            dia:dayName,
+            horaini: horaini1,
+            horafin:horafin1
+          }
+          
+          listadias.push(dia)
+        }
+        
+
+
+        
+        
+        
+        console.log(listadias)
+        this.turnos = listadias})
     },
     data: ()=>({
       dialog:false,
       picker: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
-      time: null,
+      time: [],
+      info:null,
       time2:null,
       menudate:false,
         menu2: false,
         menu3:false,
         modal2: false,
         turnos:[
-          {
-          dia:"Lunes",
-          horaini:"19:30",
-          horafin:"20:00"
-          },
-          {
-          dia:"Martes",
-          horaini:"19:30",
-          horafin:"20:00"
-          },{
-          dia:"Miercoles",
-          horaini:"19:30",
-          horafin:"20:00"
-          },{
-          dia:"Jueves",
-          horaini:"19:30",
-          horafin:"20:00"
-          },{
-          dia:"Viernes",
-          horaini:"19:30",
-          horafin:"20:00"
-          },{
-          dia:"Sabado",
-          horaini:"19:30",
-          horafin:"20:00"
-          },{
-          dia:"Domingo",
-          horaini:"19:30",
-          horafin:"20:00"
-          },{
-           dia:"Lunes",
-          horaini:"7:30",
-          horafin:"8:00"
-          },
-          {
-          dia:"Martes",
-          horaini:"7:30",
-          horafin:"8:00"
-          },
-          {
-          dia:"Miercoles",
-          horaini:"7:30",
-          horafin:"8:00"
-          },{
-          dia:"Lunes",
-          horaini:"8:30",
-          horafin:"9:00"
-          },
-          {
-          dia:"Martes",
-          horaini:"9:30",
-          horafin:"9:00"
-          },
-          {
-          dia:"Miercoles",
-          horaini:"8:30",
-          horafin:"9:00"
-          },
+          
         ],
     }),
     methods: {
@@ -376,7 +380,7 @@
     },
     computed: {
 
-    }
+    },
 }
 
 
