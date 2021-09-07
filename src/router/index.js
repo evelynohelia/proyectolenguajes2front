@@ -32,6 +32,16 @@ const routes = [
     path:'/profesional/:id',
     name: 'Profesional',
     component : () => import(/* webpackChunkName: "about"*/'../views/Profesional.vue')
+  },
+  {
+    path:'/search/:data',
+    name:'Busqueda',
+    component : () => import(/* webpackChunkName: "about"*/'../views/Search.vue')
+  },
+  {
+    path:'/search/',
+    name:'Busqueda',
+    component : () => import(/* webpackChunkName: "about"*/'../views/Search.vue')
   }
 ]
 

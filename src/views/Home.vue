@@ -14,6 +14,7 @@
             label="Buscar Profesional"
             hide-details="auto"
             color="black"
+            v-model="buscarInput"
           ></v-text-field>
           </v-col>
           <v-col cols="12"
@@ -54,13 +55,14 @@
     },
     methods:{
       buscar: function(){
-        alert("buscando")
+        this.$router.push({ path: `/search/${this.buscarInput}` })
       }
     },
     data(){
       return{
           profesionales: [],
-          load : false
+          load : false,
+          buscarInput: ""
       }
     },
     mounted(){
@@ -74,11 +76,13 @@
   }
 </script>
 
-<style scoped>
+<style>
   .root{
     background-image: url("https://www.nicepng.com/png/full/225-2250557_world-world-map-black-and-grey-poster-36.png");
     width :100vw;
     height :100vh;
     background-size: cover;
+    position: fixed;
+    overflow: scroll;
   }
 </style>
