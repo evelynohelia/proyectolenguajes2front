@@ -14,7 +14,7 @@
                 class="item-cita my-1 "
                 >
                 <v-list-item-icon>
-                    <!--<v-icon v-text="item.icon"></v-icon>-->
+                    <v-icon class="img-client">mdi-account</v-icon>
                 </v-list-item-icon>
                 <v-list-item-content>
                     <v-row>
@@ -34,6 +34,13 @@
                                 {{cita.estado}}
                             </v-chip>
                             </div>
+                             <v-btn
+                                class="delete"
+                                color="error"
+                                plain
+                                >
+                                Eliminar
+                            </v-btn>
                         </v-col>
                     </v-row>
                 </v-list-item-content>
@@ -50,6 +57,9 @@
     }
     .price{
         margin-right: 20%;
+        text-align: right;
+    }
+    .delete{
         text-align: right;
     }
 

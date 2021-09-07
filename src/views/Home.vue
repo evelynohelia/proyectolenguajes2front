@@ -39,15 +39,43 @@
 <script>
 
   import Navegacion from '../components/Navegacion.vue';
+  import axios from 'axios';
   export default {
     name: 'Home',
+    data () {
+      return {
+        personas:{}
+      }
+    },
     components:{
       Navegacion,
     },
+    mounted(){
+      this.getPersonas();
+    },
+
     methods:{
       buscar: function(){
         alert("buscando")
-      }
+      },
+
+      async getPersonas () {
+        let _this = this;
+        let token = localStorage.getItem('token',token);
+
+           await axios.get('http://localhost:8000/api/personas?token='+token, {headers: {'X-Requested-With': 'XMLHttpRequest'}})
+            .then(function(response) {
+                if(response.status==200) {
+                  _this.personas=response.data; 
+                  console.log(response.data);
+                }
+            })
+            .catch(function(err) {
+                console.log(err);
+            })         
+        
+        //this.$refs.form.validate()
+      },
     }
   }
 </script>
