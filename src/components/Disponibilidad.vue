@@ -274,6 +274,8 @@
               <h3>Dia: {{hora.dia}}</h3>
               <h3>Hora inicio: {{hora.horaini}}</h3>
               <h3>Hora Fin: {{hora.horafin}}</h3>
+              <h3>Descripcion: {{hora.descripcion}}</h3>
+              <h3>Precio: {{hora.precio}}</h3>
             </v-card-text>
             <v-card-actions class="justify-end">
                <v-btn v-if=isProfe
@@ -335,15 +337,15 @@
 </template>
 
 <script lang="js">
-
   export default  {
     
     name: 'Disponibilidad',
     props: [],
     mounted () {
+      
       const axios = require('axios').default;
       axios
-      .get('http://127.0.0.1:8000/api/turnos')
+      .get('http://127.0.0.1:8000/api/turnos/profesionales/'+9)
       .then(response => {
         let listadias=[];
         let diasmap=new Map()
@@ -351,6 +353,7 @@
         console.log(response.data)
         if(Array.isArray(response.data)){
           response.data.forEach(element => {
+          
           let fechaini=new Date();
           fechaini.setTime(Date.parse(element.fecha_inicio));
           let fechafin=new Date()
@@ -366,7 +369,9 @@
             id:element.id,
             dia:dayName,
             horaini: horaini1,
-            horafin:horafin1
+            horafin:horafin1,
+            descripcion:element.descripcion,
+            precio:element.precio
           }
           if(!diasmap.has(dayName)){
             console.log(dayName)
@@ -375,11 +380,9 @@
           }
           else{
             diasmap.get(dayName).push(dia)
-
           }
           
           listadias.push(dia)
-
         }
         );
         }
@@ -409,14 +412,11 @@
           }
           else{
             diasmap.get(dayName).push(dia)
-
           }
           
           listadias.push(dia)
         }
         
-
-
         
         
         console.log(diasmap)
@@ -459,7 +459,7 @@
          console.log(inicio)
           
           let axios = require('axios').default;
-         axios.post('http://127.0.0.1:8000/api/servicios',{descripcion:event.descripcion,precio:event.Precio,profesional_id:9}).then(response=>{
+         axios.post('http://127.0.0.1:8000/api/servicios',{descripcion:event.descripcion,precio:event.Precio,profesional_id:10}).then(response=>{
            console.log(response.data)
            axios.post('http://127.0.0.1:8000/api/turnos',{fecha_inicio:inicio,fecha_fin:fin,id_servicio:response.data.id,estado:true})
          })
@@ -468,16 +468,12 @@
       
     },
     computed: {
-
     },
 }
-
-
 </script>
 
 <style scoped lang="scss">
   .Disponibilidad {
-
   }
   .cabecerad{
     margin-top: 1rem;
