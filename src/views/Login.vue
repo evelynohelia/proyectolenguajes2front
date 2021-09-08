@@ -46,11 +46,7 @@
                     >
                     Login
                     </v-btn>  
-                    <v-btn
-                    @click="auth"
-                    >
-                    auth
-                    </v-btn> 
+                     
                 </v-col>
             </v-container>
         </v-form>
