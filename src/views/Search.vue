@@ -41,7 +41,7 @@
 
 <script>
 import Navegacion from "../components/Navegacion.vue";
-import ProfCard from '../components/ProfCard.vue';
+import ProfCard from '../components/ProfCardSearch.vue';
 import axios from 'axios';
 export default{
     name:"Search",
