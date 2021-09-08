@@ -22,6 +22,7 @@
         
         return{
           bol:true
+          
         }
     },
     components:{

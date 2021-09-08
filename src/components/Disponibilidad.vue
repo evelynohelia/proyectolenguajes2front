@@ -340,9 +340,14 @@
   export default  {
     
     name: 'Disponibilidad',
-    props: { isProfes:Boolean},
+    props: { isProfes:Boolean,idProfesional:Number},
     mounted () {
-      
+      if(!this.isProfes){
+        this.idusuario=this.idProfesional
+      }
+      else{
+        this.idusuario=1
+      }
       this.cargarTurnos()
     },
     data: ()=>({
@@ -350,6 +355,7 @@
       dayss : ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado','Domingo'],
       picker: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
       time: [],
+      idusuario:0,
       date:"",
       Descripcion:"",
       precio:"",
@@ -389,7 +395,7 @@
          console.log(inicio)
           
           let axios = require('axios').default;
-         axios.post('http://127.0.0.1:8000/api/servicios',{descripcion:event.descripcion,precio:event.Precio,profesional_id:10}).then(response=>{
+         axios.post('http://127.0.0.1:8000/api/servicios',{descripcion:event.descripcion,precio:event.Precio,profesional_id:this.idusuario}).then(response=>{
            console.log(response.data)
            axios.post('http://127.0.0.1:8000/api/turnos',{fecha_inicio:inicio,fecha_fin:fin,id_servicio:response.data.id,estado:true}).then(res=>{
           this.cargarTurnos()
@@ -431,7 +437,7 @@
   cargarTurnos :function(){
     const axios = require('axios').default;
       axios
-      .get('http://127.0.0.1:8000/api/turnos/profesionales/'+10)
+      .get('http://127.0.0.1:8000/api/turnos/profesionales/'+this.idusuario)
       .then(response => {
         let listadias=[];
         let diasmap=new Map()

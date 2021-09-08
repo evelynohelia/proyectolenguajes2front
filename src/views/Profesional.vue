@@ -32,7 +32,7 @@
         <v-container class="mt-2">
             <div v-if="desc" >Descripcion</div>
             <div v-if="disp" >
-                <Disponibilidad :isProfes="bol"></Disponibilidad>
+                <Disponibilidad :isProfes="bol" :idProfesional="idprofe"></Disponibilidad>
 
             </div>
         </v-container>
@@ -55,7 +55,8 @@ export default {
             desc: true,
             disp : false,
             persona: {},
-            bol:false
+            bol:false,
+            idprofe:this.$route.params.id
         };
     },
     mounted(){
