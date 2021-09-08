@@ -21,6 +21,7 @@
             </v-icon>
         </div>
         </v-btn>
+        <v-btn color="yellow" v-on:click="cerrarSesion()">Logout</v-btn>
     </v-toolbar>
 </template>
 
@@ -32,6 +33,12 @@ export default {
         return {
             prof:false,
             id: 0,
+        }
+    },
+    methods:{
+        cerrarSesion(){
+            localStorage.removeItem("token");
+            window.location.reload();
         }
     },
     mounted(){
