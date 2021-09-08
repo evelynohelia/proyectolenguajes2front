@@ -3,7 +3,7 @@
         <Navegacion/>
             <v-data-table
                 :headers="headers"
-                :items="citas"
+                :items="citasPublicasCliente"
                 sort-by="calories"
                 class="elevation-1"
             >
@@ -29,76 +29,49 @@
 
                         <v-card-text>
                         <v-container>
-                            <v-row>
-                            <v-col
-                                cols="12"
-                                sm="6"
-                                md="4"
-                            >
                                 <v-text-field
                                 v-model="editedCita.servicio.descripcion"
                                 label="Servicio"
                                 ></v-text-field>
-                            </v-col>
-                            <v-col
-                                cols="12"
-                                sm="6"
-                                md="4"
-                            >
-                                <v-text-field
+                                <v-text-field v-if="esProfesional==1"
                                 v-model="editedCita.cliente.apellidos"
                                 label="Cliente"
                                 ></v-text-field>
-                            </v-col>
-                            <v-col
-                                cols="12"
-                                sm="6"
-                                md="4"
-                            >
+                                <v-text-field v-if="esProfesional==0"
+                                v-model="editedCita.profesional.apellidos"
+                                label="Cliente"
+                                ></v-text-field>
                                 <v-text-field
                                 v-model="editedCita.turno.fecha_inicio"
                                 label="Fecha"
                                 ></v-text-field>
-                            </v-col>
-                            <v-col
-                                cols="12"
-                                sm="6"
-                                md="4"
-                            >
                                 <v-text-field
                                 v-model="editedCita.estado"
                                 label="Estado"
                                 ></v-text-field>
-                            </v-col>
-                            <v-col
-                                cols="12"
-                                sm="6"
-                                md="4"
-                            >
                                 <v-text-field
                                 v-model="editedCita.servicio.precio"
                                 label="Precio"
                                 ></v-text-field>
-                            </v-col>
-                            </v-row>
                         </v-container>
                         </v-card-text>
 
                         <v-card-actions>
                         <v-spacer></v-spacer>
                         <v-btn
-                            color="blue darken-1"
+                            color="red darken-1"
                             text
+                            v-if="editedCita.estado=='Aceptado'|| editedCita.estado=='Pendinte'"
                             @click="onCancelCita"
                         >
-                            Cancel
+                            Cancelar cita
                         </v-btn>
                         <v-btn
                             color="blue darken-1"
                             text
                             @click="save"
                         >
-                            Save
+                            Salir
                         </v-btn>
                         </v-card-actions>
                     </v-card>
@@ -108,8 +81,8 @@
                         <v-card-title class="text-h5">¿Esta seguro de cancelar su cita?</v-card-title>
                         <v-card-actions>
                         <v-spacer></v-spacer>
+                        <v-btn color="red darken-1" text @click="cancelCita">Sí</v-btn>
                         <v-btn color="blue darken-1" text @click="closeDialogCancelCita">No</v-btn>
-                        <v-btn color="blue darken-1" text @click="cancelCita">Sí</v-btn>
                         <v-spacer></v-spacer>
                         </v-card-actions>
                     </v-card>
@@ -127,13 +100,22 @@
                     </v-dialog>
                 </v-toolbar>
                 </template>
+                
+                <template v-slot:item.nombre="props">
+
+                <span v-if="esProfesional==1">{{props.item.cliente.nombres}} {{props.item.cliente.apellidos}}</span>
+                <span v-if="esProfesional==0">{{props.item.profesional.nombres}} {{props.item.profesional.apellidos}}</span>
+                
+                </template>
+             
+             
                 <template v-slot:item.actions="{item}">
                 <v-icon
                     small
                     class="mr-2"
                     @click="editItem(item)"
                 >
-                    mdi-pencil
+                    mdi-eye
                 </v-icon>
                 <v-icon
                     small
@@ -189,6 +171,7 @@ export default {
     data () {
       return {
             idPersona: this.$route.params['id'],
+            esProfesional: 0,
             citas: [],
             selectedCita:"",
             dialog: false,
@@ -202,7 +185,7 @@ export default {
                 value: 'servicio.descripcion',
                 width: '25%'
             },
-            { text: 'Cliente', value: 'cliente.apellidos', width: '25%' },
+            { text: 'Nombre', value: 'nombre', width: '25%' },
             { text: 'Fecha', value: 'turno.fecha_inicio',width: '20%' },
             { text: 'Estado', value: 'estado', width: '10%' },
             { text: 'Precio', value: 'servicio.precio', width: '10%' },
@@ -215,6 +198,7 @@ export default {
                 estado: '',
                 turno: '',
                 fecha: '',
+                profesional: '',
             },
             defaultItem: {
                 servicio: '',
@@ -222,6 +206,7 @@ export default {
                 estado: '',
                 turno: '',
                 fecha: '',
+                profesional: '',
             },
         }
     },
@@ -233,8 +218,23 @@ export default {
     },
     computed: {
       formTitle () {
-        return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
+        return this.editedIndex === -1 ? 'New Item' : 'Cita'
       },
+      citasPublicasCliente(){
+          if(this.citas){
+            let result = this.citas.filter(cita => cita.acceso_cliente != "Borrador");
+            return result
+          }
+        return []
+      },
+      citasPublicasProfesional(){
+          if(this.citas){
+            let result = this.citas.filter(cita => cita.acceso_profesional != "Borrador");
+            return result
+          }
+        return []
+      }
+
     },
 
     watch: {
@@ -257,6 +257,21 @@ export default {
         },    
 
         cancelCita(){
+            let _this = this;
+            axios.post('http://localhost:8000/api/changeStatusCitas/'+ _this.editedCita.id,
+            {'status': 'Cancelado'}
+            )
+            .then(function(res) {
+                if(res.status==200) {
+                   console.log(res);
+                    _this.dialogCancelCita = false
+                    _this.dialog = false
+                    _this.getHistorial()
+                }
+            })
+            .catch(function(err) {
+                console.log(err);
+            })
 
         },
 
@@ -288,6 +303,29 @@ export default {
 
       deleteItemConfirm () {
         this.citas.splice(this.editedIndex, 1)
+        let _this = this;
+        if(this.esProfesional==0){
+            axios.post("http://localhost:8000/api/cliente/citasDelete/"+ _this.editedCita.id)
+            .then(function(res) {
+                if(res.status==200) {
+                    console.log(res);
+                }
+            })
+            .catch(function(err) {
+                console.log(err);
+            })
+        }
+        else{
+            axios.post("http://localhost:8000/api/profesional/citasDelete/"+ _this.editedCita.id)
+            .then(function(res) {
+                if(res.status==200) {
+                    console.log(res);
+                }
+            })
+            .catch(function(err) {
+                console.log(err);
+            })  
+        }
         this.closeDelete()
       },
 
