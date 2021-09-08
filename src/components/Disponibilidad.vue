@@ -341,10 +341,9 @@
     name: 'Disponibilidad',
     props: [],
     mounted () {
-      
       const axios = require('axios').default;
       axios
-      .get('http://127.0.0.1:8000/api/turnos/profesionales/'+9)
+      .get('http://127.0.0.1:8000/api/turnos')
       .then(response => {
         let listadias=[];
         let diasmap=new Map()
@@ -460,7 +459,7 @@
          console.log(inicio)
           
           let axios = require('axios').default;
-         axios.post('http://127.0.0.1:8000/api/servicios',{descripcion:event.descripcion,precio:event.Precio,profesional_id:10}).then(response=>{
+         axios.post('http://127.0.0.1:8000/api/servicios',{descripcion:event.descripcion,precio:event.Precio,profesional_id:9}).then(response=>{
            console.log(response.data)
            axios.post('http://127.0.0.1:8000/api/turnos',{fecha_inicio:inicio,fecha_fin:fin,id_servicio:response.data.id,estado:true})
          })
