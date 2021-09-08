@@ -9,11 +9,12 @@
                 md="12"
                 >
                 <v-text-field
-                    v-model="email"
+                    v-model="credentials.email"
                     :rules="emailRules"
                     label="E-mail"
                     color="black"
                     required
+                    ref="form"
                 ></v-text-field>
                 </v-col>
                                 <v-col
@@ -21,7 +22,7 @@
                 md="12"
                 >
                 <v-text-field
-                    v-model="password"
+                    v-model="credentials.password"
                     :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
                     :rules="[rules.required, rules.min]"
                     :type="show1 ? 'text' : 'password'"
@@ -45,6 +46,11 @@
                     >
                     Login
                     </v-btn>  
+                    <v-btn
+                    @click="auth"
+                    >
+                    auth
+                    </v-btn> 
                 </v-col>
             </v-container>
         </v-form>
@@ -53,11 +59,25 @@
 </template>
 
 <script>
-  export default {
+import axios from 'axios';
+axios.defaults.withCredentials= true;
+axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+
+export default {
     data () {
       return {
+        credentials:{
+          email: '',
+          password: '',
+        },
+        user: {},
+        authUser:{},
         show1: false,
-        password: '',
+        valid: true,
+        emailRules: [
+          v => !!v || 'E-mail is required',
+          v => /.+@.+\..+/.test(v) || 'E-mail must be valid',
+        ],
         rules: {
           required: value => !!value || 'Required.',
           min: v => v.length >= 8 || 'Min 8 characters',
@@ -65,6 +85,50 @@
         },
       }
     },
+    mounted (){
+    },
+    methods:
+    {
+      async auth(){
+        let _this=this;
+        await axios.get('http://localhost:8000/api/user', {withCredentials: true})
+        .then(function(response) {
+              _this.authUser = response.data;
+            })
+            .catch(function(err) {
+                console.log(err);
+            }) 
+      },
+
+      async validate () {
+        let _this=this;
+           await axios.post('http://localhost:8000/api/auth/login', this.credentials,{headers: {'X-Requested-With': 'XMLHttpRequest'}})
+            .then(function(response) {
+                if(response.status==200) {
+                  _this.user = response.data;
+                  let token = response.data.access_token;
+                  let base64URL = token.split('.')[1];
+                  let base64 = base64URL.replace('-','+').replace('_','/')
+                  console.log(JSON.parse(window.atob(base64)))
+                  localStorage.setItem('token',token);
+                  _this.$router.push({ name: 'Home', query: { redirect: '/' } });
+                }
+            })
+            .catch(function(err) {
+                console.log(err);
+            })         
+        
+        //this.$refs.form.validate()
+      },
+      reset () {
+        this.$refs.form.reset()
+      },
+      resetValidation () {
+        this.$refs.form.resetValidation()
+      },
+    },
+    computed:{
+    }
   }
 </script>
 
