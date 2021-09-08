@@ -21,7 +21,7 @@
       persistent
       max-width="600px"
     >
-      <template v-slot:activator="{ on, attrs }">
+      <template v-if=isProfe v-slot:activator="{ on, attrs }">
         <v-btn
           color="primary"
           dark
@@ -179,19 +179,33 @@
       transition="slide-y-transition"
       font:
     >
-      Escriba una descripcion del servicio:
+      Escriba una descripcion del servicio y precio:
 
     </v-banner>
-    <v-col col=6>
+    <v-row align="center"
+      justify="center">
+    <v-col col=5  md=6>
 
     <v-text-field
             v-model="Descripcion"
             :rules="nameRules"
-            :counter="10"
+            :counter="50"
             label="Descripcion"
             required
           ></v-text-field>
     </v-col>
+    <v-col col=3 md=5>
+
+    <v-text-field
+            v-model="precio"
+            :rules="nameRules"
+            :counter="3"
+            label="Precio"
+            required
+          ></v-text-field>
+    </v-col>
+    
+    </v-row>
 
         </v-card-text>
         <v-card-actions>
@@ -206,6 +220,7 @@
           <v-btn
             color="blue darken-1"
             text
+             v-on:click="agregarTurno({fecha:date,horaini:time,horafin:time2,descripcion:Descripcion,Precio:precio})"
             @click="dialog = false"
           >
             Save
@@ -230,41 +245,67 @@
 
 
     <v-card-text class="scroller">
-      <v-row  v-for="turno in turnos" :key="turno.dia" align="center"
+      <v-row  v-for="dia in dayss" :key="dia" >
+
+      <v-card v-if="dias.has(dia)"><h1 class="dia">{{dia}}</h1></v-card>
+      <div  class="tarjetas" v-for="hora in dias.get(dia) " :key="hora" align="center"
       justify="center">
-        <v-col col=12 sm=2>
-          <v-card><h3 class="dia">{{turno.dia}}</h3></v-card>
-        </v-col>
-        <v-col col=12 sm=3 md=3>
-
-          <v-card><h3 class="dia">Hora inicio:{{turno.horaini}}</h3></v-card>
-          
-        </v-col>
-        <v-col col=12 sm=3 md=3>
-
-          <v-card><h3 class="dia">Hora inicio:{{turno.horafin}}</h3></v-card>
-          
-        </v-col>
-        <v-col col=12 sm=3 md=3>
-
+        
+        
+      <v-dialog
+        transition="dialog-bottom-transition"
+        max-width="300"
+      >
+        <template v-slot:activator="{ on, attrs }">
           <v-btn
-          color="blue lighten-5"
-          dark
-          v-bind="attrs"
-          v-on="on"
-          align:center
-        >
-          <p class="eliminar">Eliminar turno</p>
-        </v-btn>
+            color="primary"
+            v-bind="attrs"
+            v-on="on"
+          >Hora:{{hora.horaini}}</v-btn>
+        </template>
+        <template v-slot:default="dialog">
+          <v-card>
+            <v-toolbar
+              color="primary"
+              dark
+            >Descripción</v-toolbar>
+            <v-card-text>
+              <br>
+              <h3>Dia: {{hora.dia}}</h3>
+              <h3>Hora inicio: {{hora.horaini}}</h3>
+              <h3>Hora Fin: {{hora.horafin}}</h3>
+            </v-card-text>
+            <v-card-actions class="justify-end">
+               <v-btn v-if=isProfe
+                text
+                v-on:click="borrarTurno(hora.id)"
+                @click="dialog.value = false"
+              >Borrar</v-btn>
+              <v-btn v-if=!isProfe
+                text
+                @click="dialog.value = false"
+              >Agendar Cita</v-btn>
+              <v-btn
+                text
+                @click="dialog.value = false"
+              >Close</v-btn>
+            </v-card-actions>
+          </v-card>
+        </template>
+      </v-dialog>
+
           
-        </v-col>
+          
+
+          
+        
 
           
           
         
 
 
-        
+      </div>
       </v-row>
       </v-card-text>
       
@@ -302,9 +343,10 @@
     mounted () {
       const axios = require('axios').default;
       axios
-      .get('http://127.0.0.1:8000/api/turno')
+      .get('http://127.0.0.1:8000/api/turnos')
       .then(response => {
         let listadias=[];
+        let diasmap=new Map()
         let days = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'];
         console.log(response.data)
         if(Array.isArray(response.data)){
@@ -321,9 +363,19 @@
           let horafin1=""+horasfin+":"+minutofin1;
           let dayName = days[fechaini.getDay()];
           let dia={
+            id:element.id,
             dia:dayName,
             horaini: horaini1,
             horafin:horafin1
+          }
+          if(!diasmap.has(dayName)){
+            console.log(dayName)
+            diasmap.set(dayName, [])
+            diasmap.get(dayName).push(dia)
+          }
+          else{
+            diasmap.get(dayName).push(dia)
+
           }
           
           listadias.push(dia)
@@ -345,9 +397,19 @@
           let horafin1=""+horasfin+":"+minutofin1;
           let dayName = days[fechaini.getDay()];
           let dia={
+            hora:element.id,
             dia:dayName,
             horaini: horaini1,
             horafin:horafin1
+          }
+          if(!diasmap.has(dayName)){
+            console.log(dayName)
+            diasmap.set(dayName, [])
+            diasmap.get(dayName).push(dia)
+          }
+          else{
+            diasmap.get(dayName).push(dia)
+
           }
           
           listadias.push(dia)
@@ -357,14 +419,18 @@
 
         
         
-        
+        console.log(diasmap)
         console.log(listadias)
+        this.dias=diasmap
         this.turnos = listadias})
     },
     data: ()=>({
       dialog:false,
+      dayss : ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado','Domingo'],
       picker: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
       time: [],
+      isProfe:true,
+      dias:new Map(),
       info:null,
       time2:null,
       menudate:false,
@@ -376,7 +442,30 @@
         ],
     }),
     methods: {
-
+      
+      borrarTurno: function (event) {
+        let axios = require('axios').default;
+         axios.delete('http://127.0.0.1:8000/api/turnos/'+event)
+    },
+    agregarTurno: function(event){
+      //^[0-9]{1,3}$
+        console.log(event)
+        if(event.horaini>event.horafin || !event.fecha || !event.horaini|| !event.horafin || !event.descripcion || !/^[0-9]{1,3}$/.test(event.Precio) | event.descripcion.length>50){
+          alert("Los datos no estan digitados correctamente")
+        }
+        else{
+           let inicio = new Date(event.fecha+ ' ' + event.horaini).toISOString().slice(0, 19).replace('T', ' ');
+           let fin = new Date(event.fecha+ ' ' + event.horafin).toISOString().slice(0, 19).replace('T', ' ');
+         console.log(inicio)
+          
+          let axios = require('axios').default;
+         axios.post('http://127.0.0.1:8000/api/servicios',{descripcion:event.descripcion,precio:event.Precio,profesional_id:9}).then(response=>{
+           console.log(response.data)
+           axios.post('http://127.0.0.1:8000/api/turnos',{fecha_inicio:inicio,fecha_fin:fin,id_servicio:response.data.id,estado:true})
+         })
+        }
+}
+      
     },
     computed: {
 
@@ -411,6 +500,13 @@
   }
   html {
   overflow: hidden !important;
+  .tarjetas{
+    margin-left: 1rem;
+    margin-right: 1rem;
+  }
+  .boton{
+    margin-right: 100;
+  }
 }
   
 </style>
