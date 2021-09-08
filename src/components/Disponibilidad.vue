@@ -343,7 +343,93 @@
     props: { isProfes:Boolean},
     mounted () {
       
-      const axios = require('axios').default;
+      this.cargarTurnos()
+    },
+    data: ()=>({
+      dialog:false,
+      dayss : ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado','Domingo'],
+      picker: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+      time: [],
+      date:"",
+      Descripcion:"",
+      precio:"",
+      isProfe:true,
+      dias:new Map(),
+      info:null,
+      time2:null,
+      menudate:false,
+        menu2: false,
+        menu3:false,
+        modal2: false,
+        turnos:[
+          
+        ],
+    }),
+    methods: {
+      
+      borrarTurno: function (event) {
+        let axios = require('axios').default;
+         axios.delete('http://127.0.0.1:8000/api/turnos/'+event).then(res=>{
+          this.cargarTurnos()
+          console.log(res)
+         })
+    },
+    agregarTurno: function(event){
+      //^[0-9]{1,3}$
+        console.log(event)
+        if(event.horaini>event.horafin || !event.fecha || !event.horaini|| !event.horafin || !event.descripcion || !/^[0-9]{1,3}$/.test(event.Precio) | event.descripcion.length>50){
+          alert("Los datos no estan digitados correctamente")
+        }
+        else{
+           let inicio = new Date(event.fecha+ ' ' + event.horaini)
+           console.log(inicio)
+           inicio=this.toIsoString(inicio).slice(0, 19).replace('T', ' ');
+           let fin = new Date(event.fecha+ ' ' + event.horafin);
+           fin= this.toIsoString(fin).slice(0, 19).replace('T', ' ');
+         console.log(inicio)
+          
+          let axios = require('axios').default;
+         axios.post('http://127.0.0.1:8000/api/servicios',{descripcion:event.descripcion,precio:event.Precio,profesional_id:10}).then(response=>{
+           console.log(response.data)
+           axios.post('http://127.0.0.1:8000/api/turnos',{fecha_inicio:inicio,fecha_fin:fin,id_servicio:response.data.id,estado:true}).then(res=>{
+          this.cargarTurnos()
+          console.log(res)
+         })
+         })
+        }
+},
+    agregarCita: function(event){
+      console.log(event)
+      let axios = require('axios').default;
+      axios.post('http://127.0.0.1:8000/api/citas',{id_turno:event.idturno,id_cliente:1,descripcion:event.descripcion,estado:true,acceso_cliente	:true,acceso_profesional:true}).then(
+        response=>{
+          console.log(response)
+          axios.put('http://127.0.0.1:8000/api/turnos/'+event.idturno,{estado:false}).then(res=>{
+          this.cargarTurnos()
+          console.log(res)
+         })
+        }
+      )
+    },
+    toIsoString :function(date) {
+  var tzo = -date.getTimezoneOffset(),
+      dif = tzo >= 0 ? '+' : '-',
+      pad = function(num) {
+          var norm = Math.floor(Math.abs(num));
+          return (norm < 10 ? '0' : '') + norm;
+      };
+
+  return date.getFullYear() +
+      '-' + pad(date.getMonth() + 1) +
+      '-' + pad(date.getDate()) +
+      'T' + pad(date.getHours()) +
+      ':' + pad(date.getMinutes()) +
+      ':' + pad(date.getSeconds()) +
+      dif + pad(tzo / 60) +
+      ':' + pad(tzo % 60);
+},
+  cargarTurnos :function(){
+    const axios = require('axios').default;
       axios
       .get('http://127.0.0.1:8000/api/turnos/profesionales/'+10)
       .then(response => {
@@ -426,81 +512,7 @@
         console.log(listadias)
         this.dias=diasmap
         this.turnos = listadias})
-    },
-    data: ()=>({
-      dialog:false,
-      dayss : ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado','Domingo'],
-      picker: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
-      time: [],
-      date:"",
-      Descripcion:"",
-      precio:"",
-      isProfe:true,
-      dias:new Map(),
-      info:null,
-      time2:null,
-      menudate:false,
-        menu2: false,
-        menu3:false,
-        modal2: false,
-        turnos:[
-          
-        ],
-    }),
-    methods: {
-      
-      borrarTurno: function (event) {
-        let axios = require('axios').default;
-         axios.delete('http://127.0.0.1:8000/api/turnos/'+event)
-    },
-    agregarTurno: function(event){
-      //^[0-9]{1,3}$
-        console.log(event)
-        if(event.horaini>event.horafin || !event.fecha || !event.horaini|| !event.horafin || !event.descripcion || !/^[0-9]{1,3}$/.test(event.Precio) | event.descripcion.length>50){
-          alert("Los datos no estan digitados correctamente")
-        }
-        else{
-           let inicio = new Date(event.fecha+ ' ' + event.horaini)
-           console.log(inicio)
-           inicio=this.toIsoString(inicio).slice(0, 19).replace('T', ' ');
-           let fin = new Date(event.fecha+ ' ' + event.horafin);
-           fin= this.toIsoString(fin).slice(0, 19).replace('T', ' ');
-         console.log(inicio)
-          
-          let axios = require('axios').default;
-         axios.post('http://127.0.0.1:8000/api/servicios',{descripcion:event.descripcion,precio:event.Precio,profesional_id:10}).then(response=>{
-           console.log(response.data)
-           axios.post('http://127.0.0.1:8000/api/turnos',{fecha_inicio:inicio,fecha_fin:fin,id_servicio:response.data.id,estado:true})
-         })
-        }
-},
-    agregarCita: function(event){
-      console.log(event)
-      let axios = require('axios').default;
-      axios.post('http://127.0.0.1:8000/api/citas',{id_turno:event.idturno,id_cliente:1,descripcion:event.descripcion,estado:true,acceso_cliente	:true,acceso_profesional:true}).then(
-        response=>{
-          console.log(response)
-          axios.put('http://127.0.0.1:8000/api/turnos/'+event.idturno,{estado:false})
-        }
-      )
-    },
-    toIsoString :function(date) {
-  var tzo = -date.getTimezoneOffset(),
-      dif = tzo >= 0 ? '+' : '-',
-      pad = function(num) {
-          var norm = Math.floor(Math.abs(num));
-          return (norm < 10 ? '0' : '') + norm;
-      };
-
-  return date.getFullYear() +
-      '-' + pad(date.getMonth() + 1) +
-      '-' + pad(date.getDate()) +
-      'T' + pad(date.getHours()) +
-      ':' + pad(date.getMinutes()) +
-      ':' + pad(date.getSeconds()) +
-      dif + pad(tzo / 60) +
-      ':' + pad(tzo % 60);
-}
+  }
       
     },
     computed: {
