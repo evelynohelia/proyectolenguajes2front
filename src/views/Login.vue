@@ -47,9 +47,9 @@
                     Login
                     </v-btn>  
                     <v-btn
-                    @click="auth"
+                    href="/register"
                     >
-                    auth
+                    Register
                     </v-btn> 
                 </v-col>
             </v-container>

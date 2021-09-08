@@ -108,11 +108,7 @@
                     >
                     Register
                     </v-btn>  
-                    <v-btn
-                    @click="auth"
-                    >
-                    auth
-                    </v-btn> 
+                    
                 </v-col>
             </v-container>
         </v-form>
@@ -161,10 +157,10 @@ export default {
           console.log(this.credentials)
     
            await axios.post('http://localhost:8000/api/auth/register', this.credentials,{headers: {'X-Requested-With': 'XMLHttpRequest'}})
-            .then(function(response) {
-                if(response.status==200) {
-                  this.$router.push({ name: 'Login', query: { redirect: '/login' } });
-                }
+            .then(response=> {
+                console.log(response)
+                  this.$router.push('/login');
+                
             })
             .catch(function(err) {
                 console.log(err);
