@@ -44,6 +44,11 @@ const routes = [
     component : () => import(/* webpackChunkName: "about"*/'../views/Search.vue')
   },
   {
+    path:'/disponibilidad',
+    name:'DisponibilidadView',
+    component : () => import(/* webpackChunkName: "about"*/'../views/DisponibilidadView.vue')
+  },
+  {
     path:'/historial/:id',
     name: 'historial',
     component : () => import(/* webpackChunkName: "about"*/'../views/Historial.vue'),

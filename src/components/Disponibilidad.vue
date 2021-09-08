@@ -1,7 +1,6 @@
 <template lang="html">
 
   <section class="Disponibilidad">
-    
     <v-container class="grey lighten-5" >
     <v-row no-gutters >
       <v-col
@@ -21,7 +20,7 @@
       persistent
       max-width="600px"
     >
-      <template v-if=isProfe v-slot:activator="{ on, attrs }">
+      <template v-if=isProfes v-slot:activator="{ on, attrs }">
         <v-btn
           color="primary"
           dark
@@ -40,7 +39,7 @@
             
               
               <v-banner
-      v-model="v0"
+      
       single-line
       transition="slide-y-transition"
       font:
@@ -94,7 +93,7 @@
         </v-date-picker>
       </v-menu>
       <v-banner
-      v-model="v0"
+      
       single-line
       transition="slide-y-transition"
       font:
@@ -174,7 +173,7 @@
   </v-row>
   
     <v-banner
-      v-model="v0"
+      
       single-line
       transition="slide-y-transition"
       font:
@@ -188,7 +187,7 @@
 
     <v-text-field
             v-model="Descripcion"
-            :rules="nameRules"
+            
             :counter="50"
             label="Descripcion"
             required
@@ -198,7 +197,7 @@
 
     <v-text-field
             v-model="precio"
-            :rules="nameRules"
+            
             :counter="3"
             label="Precio"
             required
@@ -234,7 +233,7 @@
 
     </v-row>
   <!--aqui termia la parte de arriba del componente-->
-  <v-space></v-space>
+  <v-spacer></v-spacer>
   <h4 class= "cabecerad">Dias disponibles</h4> 
 
     
@@ -248,7 +247,7 @@
       <v-row  v-for="dia in dayss" :key="dia" >
 
       <v-card v-if="dias.has(dia)"><h1 class="dia">{{dia}}</h1></v-card>
-      <div  class="tarjetas" v-for="hora in dias.get(dia) " :key="hora" align="center"
+      <div  class="tarjetas" v-for="hora in dias.get(dia) " :key="hora.dia" align="center"
       justify="center">
         
         
@@ -278,12 +277,12 @@
               <h3>Precio: {{hora.precio}}</h3>
             </v-card-text>
             <v-card-actions class="justify-end">
-               <v-btn v-if=isProfe
+               <v-btn v-if=isProfes
                 text
                 v-on:click="borrarTurno(hora.id)"
                 @click="dialog.value = false"
               >Borrar</v-btn>
-              <v-btn v-if=!isProfe
+              <v-btn v-if=!isProfes
                 text
                 @click="dialog.value = false"
               >Agendar Cita</v-btn>
@@ -340,12 +339,12 @@
   export default  {
     
     name: 'Disponibilidad',
-    props: [],
+    props: { isProfes:Boolean},
     mounted () {
       
       const axios = require('axios').default;
       axios
-      .get('http://127.0.0.1:8000/api/turnos/profesionales/'+9)
+      .get('http://127.0.0.1:8000/api/turnos/profesionales/'+10)
       .then(response => {
         let listadias=[];
         let diasmap=new Map()
@@ -429,6 +428,9 @@
       dayss : ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado','Domingo'],
       picker: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
       time: [],
+      date:"",
+      Descripcion:"",
+      precio:"",
       isProfe:true,
       dias:new Map(),
       info:null,
