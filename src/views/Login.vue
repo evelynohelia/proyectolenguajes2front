@@ -89,17 +89,7 @@ export default {
     },
     methods:
     {
-      async auth(){
-        let _this=this;
-        await axios.get('http://localhost:8000/api/user', {withCredentials: true})
-        .then(function(response) {
-              _this.authUser = response.data;
-            })
-            .catch(function(err) {
-                console.log(err);
-            }) 
-      },
-
+      
       async validate () {
         let _this=this;
            await axios.post('http://localhost:8000/api/auth/login', this.credentials,{headers: {'X-Requested-With': 'XMLHttpRequest'}})

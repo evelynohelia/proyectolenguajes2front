@@ -40,6 +40,14 @@ const routes = [
     props: {
       default: true
     }
+  },
+  {
+    path:'/citasPendientes/:id',
+    name: 'citasPendientes',
+    component : () => import(/* webpackChunkName: "about"*/'../views/CitasPendientes.vue'),
+    props: {
+      default: true
+    }
   }
 ]
 

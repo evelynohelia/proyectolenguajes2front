@@ -1,52 +1,157 @@
 <template>
     <div>
         <Navegacion/>
-            <h3 class="mx-5 my-5">HISTORIAL DE CITAS</h3>
-            <v-list flat>
-
-            <v-list-item-group
-                v-model="selectedCita"
-                color="primary"
+            <v-data-table
+                :headers="headers"
+                :items="citas"
+                sort-by="calories"
+                class="elevation-1"
             >
-                <v-list-item
-                v-for="(cita, i) in citas"
-                :key="i"
-                class="item-cita my-1 "
+                <template v-slot:top>
+                <v-toolbar
+                    flat
                 >
-                <v-list-item-icon>
-                    <v-icon class="img-client">mdi-account</v-icon>
-                </v-list-item-icon>
-                <v-list-item-content>
-                    <v-row>
-                        <v-col>
-                            <v-list-item-title>Cliente: {{cita.cliente.nombres}} {{cita.cliente.apellidos}} </v-list-item-title>
-                            <v-list-item-subtitle>Servicio: {{cita.servicio.descripcion}}</v-list-item-subtitle>
-                            <v-list-item-subtitle>fecha: {{cita.turno.fecha_inicio}}</v-list-item-subtitle>
-                        </v-col>
-                        <v-col>
-                            <h3 class="price">$ {{cita.servicio.precio}}</h3>
-                            <div>
-                            <v-chip
-                                class="item-right "
-                                color="red"
-                                text-color="white"
-                                >
-                                {{cita.estado}}
-                            </v-chip>
-                            </div>
-                             <v-btn
-                                class="delete"
-                                color="error"
-                                plain
-                                >
-                                Eliminar
-                            </v-btn>
-                        </v-col>
-                    </v-row>
-                </v-list-item-content>
-                </v-list-item>
-            </v-list-item-group>
-            </v-list>
+                    <v-toolbar-title>HISTORIAL DE CITAS</v-toolbar-title>
+                    <v-divider
+                    class="mx-4"
+                    inset
+                    vertical
+                    ></v-divider>
+                    <v-spacer></v-spacer>
+                    <v-dialog
+                    v-model="dialog"
+                    max-width="500px"
+                    >
+                    <v-card>
+                        <v-card-title>
+                        <span class="text-h5">{{ formTitle }}</span>
+                        </v-card-title>
+
+                        <v-card-text>
+                        <v-container>
+                            <v-row>
+                            <v-col
+                                cols="12"
+                                sm="6"
+                                md="4"
+                            >
+                                <v-text-field
+                                v-model="editedCita.servicio.descripcion"
+                                label="Servicio"
+                                ></v-text-field>
+                            </v-col>
+                            <v-col
+                                cols="12"
+                                sm="6"
+                                md="4"
+                            >
+                                <v-text-field
+                                v-model="editedCita.cliente.apellidos"
+                                label="Cliente"
+                                ></v-text-field>
+                            </v-col>
+                            <v-col
+                                cols="12"
+                                sm="6"
+                                md="4"
+                            >
+                                <v-text-field
+                                v-model="editedCita.turno.fecha_inicio"
+                                label="Fecha"
+                                ></v-text-field>
+                            </v-col>
+                            <v-col
+                                cols="12"
+                                sm="6"
+                                md="4"
+                            >
+                                <v-text-field
+                                v-model="editedCita.estado"
+                                label="Estado"
+                                ></v-text-field>
+                            </v-col>
+                            <v-col
+                                cols="12"
+                                sm="6"
+                                md="4"
+                            >
+                                <v-text-field
+                                v-model="editedCita.servicio.precio"
+                                label="Precio"
+                                ></v-text-field>
+                            </v-col>
+                            </v-row>
+                        </v-container>
+                        </v-card-text>
+
+                        <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn
+                            color="blue darken-1"
+                            text
+                            @click="onCancelCita"
+                        >
+                            Cancel
+                        </v-btn>
+                        <v-btn
+                            color="blue darken-1"
+                            text
+                            @click="save"
+                        >
+                            Save
+                        </v-btn>
+                        </v-card-actions>
+                    </v-card>
+                    </v-dialog>
+                    <v-dialog v-model="dialogCancelCita" max-width="500px">
+                    <v-card>
+                        <v-card-title class="text-h5">¿Esta seguro de cancelar su cita?</v-card-title>
+                        <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn color="blue darken-1" text @click="closeDialogCancelCita">No</v-btn>
+                        <v-btn color="blue darken-1" text @click="cancelCita">Sí</v-btn>
+                        <v-spacer></v-spacer>
+                        </v-card-actions>
+                    </v-card>
+                    </v-dialog>
+                    <v-dialog v-model="dialogDelete" max-width="500px">
+                        <v-card>
+                            <v-card-title class="text-h5">¿Está seguro que desea eliminar?</v-card-title>
+                            <v-card-actions>
+                            <v-spacer></v-spacer>
+                            <v-btn color="blue darken-1" text @click="closeDelete">Cancel</v-btn>
+                            <v-btn color="blue darken-1" text @click="deleteItemConfirm">OK</v-btn>
+                            <v-spacer></v-spacer>
+                            </v-card-actions>
+                        </v-card>
+                    </v-dialog>
+                </v-toolbar>
+                </template>
+                <template v-slot:item.actions="{item}">
+                <v-icon
+                    small
+                    class="mr-2"
+                    @click="editItem(item)"
+                >
+                    mdi-pencil
+                </v-icon>
+                <v-icon
+                    small
+                    @click="deleteItem(item)"
+                >
+                    mdi-delete
+                </v-icon>
+                </template>
+                <template v-slot:no-data>
+                <v-btn
+                    color="primary"
+                    @click="getHistorial"
+                >
+                    Reset
+                </v-btn>
+                </template>
+            </v-data-table>
+
     </div>
 </template>
 
@@ -60,7 +165,8 @@
         text-align: right;
     }
     .delete{
-        text-align: right;
+        display: table;
+        margin-left: auto;
     }
 
     .item-right{
@@ -83,8 +189,40 @@ export default {
     data () {
       return {
             idPersona: this.$route.params['id'],
-            citas: "",
-            selectedCita:""
+            citas: [],
+            selectedCita:"",
+            dialog: false,
+            dialogDelete: false,
+            dialogCancelCita:false,
+            headers: [
+            {
+                text: 'Servicio',
+                align: 'start',
+                sortable: false,
+                value: 'servicio.descripcion',
+                width: '25%'
+            },
+            { text: 'Cliente', value: 'cliente.apellidos', width: '25%' },
+            { text: 'Fecha', value: 'turno.fecha_inicio',width: '20%' },
+            { text: 'Estado', value: 'estado', width: '10%' },
+            { text: 'Precio', value: 'servicio.precio', width: '10%' },
+            { text: 'Acciones', value: 'actions', sortable: false, width: '10%' },
+            ],
+            editedIndex: -1,
+            editedCita: {
+                servicio: '',
+                cliente: '',
+                estado: '',
+                turno: '',
+                fecha: '',
+            },
+            defaultItem: {
+                servicio: '',
+                cliente: '',
+                estado: '',
+                turno: '',
+                fecha: '',
+            },
         }
     },
       components:{
@@ -93,10 +231,38 @@ export default {
     mounted(){
         this.getHistorial();
     },
+    computed: {
+      formTitle () {
+        return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
+      },
+    },
+
+    watch: {
+      dialog (val) {
+        val || this.close()
+      },
+      dialogDelete (val) {
+        val || this.closeDelete()
+      },
+    },
+
+    created () {
+      this.getHistorial()
+    },
+
     methods:{
+        onCancelCita(){
+            this.dialogCancelCita = true
+
+        },    
+
+        cancelCita(){
+
+        },
+
         getHistorial(){
             let _this = this;
-            axios.get('http://localhost:8000/api/cliente/citas/'+ _this.idPersona)
+            axios.get('http://localhost:8000/api/profesional/citas/'+ _this.idPersona)
             .then(function(res) {
                 if(res.status==200) {
                     _this.citas = res.data;
@@ -106,7 +272,54 @@ export default {
             .catch(function(err) {
                 console.log(err);
             })
+        },
+
+      editItem (item) {
+        this.editedIndex = this.citas.indexOf(item)
+        this.editedCita = Object.assign({}, item)
+        this.dialog = true
+      },
+
+      deleteItem (item) {
+        this.editedIndex = this.citas.indexOf(item)
+        this.editedCita = Object.assign({}, item)
+        this.dialogDelete = true
+      },
+
+      deleteItemConfirm () {
+        this.citas.splice(this.editedIndex, 1)
+        this.closeDelete()
+      },
+
+      close () {
+        this.dialog = false
+        this.$nextTick(() => {
+          this.editedCita = Object.assign({}, this.defaultItem)
+          this.editedIndex = -1
+        })
+      },
+      
+      closeDialogCancelCita(){
+        this.dialogCancelCita = false
+      },
+
+      closeDelete () {
+        this.dialogDelete = false
+        this.$nextTick(() => {
+          this.editedCita = Object.assign({}, this.defaultItem)
+          this.editedIndex = -1
+        })
+      },
+
+      save () {
+        if (this.editedIndex > -1) {
+          Object.assign(this.citas[this.editedIndex], this.editedCita)
+        } else {
+          this.citas.push(this.editedCita)
         }
+        this.close()
+      },
     }
+
 }
 </script>
