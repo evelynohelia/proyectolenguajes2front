@@ -32,7 +32,7 @@
         <v-container class="mt-2">
             <div v-if="desc" >Descripcion</div>
             <div v-if="disp" >
-                <Disponibilidad :isProfes="bol" :idProfesional="idprofe"></Disponibilidad>
+                <Disponibilidad v-if="isloaded" :isProfes="bol" :idProfesional="idprofe"></Disponibilidad>
 
             </div>
         </v-container>
@@ -56,13 +56,23 @@ export default {
             disp : false,
             persona: {},
             bol:false,
-            idprofe:this.$route.params.id
+            idprofe:0,
+            isloaded:false
+            
         };
     },
     mounted(){
         axios.get(`http://localhost:8000/api/personaProfesional/${this.$route.params.id}`).then(response => {
             this.persona = response.data[0];
+            this.idprofe=response.data[0].id;
+            this.isloaded=true;
+
+
         })
+    }
+    ,
+    methods:{
+        
     }
 }
 </script>

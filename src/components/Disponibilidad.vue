@@ -342,12 +342,10 @@
     name: 'Disponibilidad',
     props: { isProfes:Boolean,idProfesional:Number},
     mounted () {
-      if(!this.isProfes){
+      
         this.idusuario=this.idProfesional
-      }
-      else{
-        this.idusuario=1
-      }
+        console.log(this.idProfesional)
+      
       this.cargarTurnos()
     },
     data: ()=>({
@@ -407,7 +405,7 @@
     agregarCita: function(event){
       console.log(event)
       let axios = require('axios').default;
-      axios.post('http://127.0.0.1:8000/api/citas',{id_turno:event.idturno,id_cliente:1,descripcion:event.descripcion,estado:true,acceso_cliente	:true,acceso_profesional:true}).then(
+      axios.post('http://127.0.0.1:8000/api/citas',{id_turno:event.idturno,id_cliente:1,descripcion:event.descripcion,estado:"Pendiente",acceso_cliente	:true,acceso_profesional:true}).then(
         response=>{
           console.log(response)
           axios.put('http://127.0.0.1:8000/api/turnos/'+event.idturno,{estado:false}).then(res=>{

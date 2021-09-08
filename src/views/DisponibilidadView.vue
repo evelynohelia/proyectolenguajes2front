@@ -6,7 +6,7 @@
       col="12"
       md="6"
     >
-    <Disponibilidad :isProfes="bol"></Disponibilidad>
+    <Disponibilidad v-if="isloaded" :isProfes="bol" :idProfesional="profesional.id"></Disponibilidad>
     </v-col>
     </v-container>
   </div>
@@ -21,7 +21,11 @@
     data () {
         
         return{
-          bol:true
+          persona: {},
+          bol:true,
+          prof:true,
+          profesional:{},
+          isloaded:false
           
         }
     },
@@ -29,11 +33,41 @@
       Navegacion,Disponibilidad
     },
     mounted(){
-      console.log(this.bol)
+      this.getPersonas()
+      
 
     },
 
     methods:{
+              getPersonas () {
+                let axios = require('axios').default;
+        let token = localStorage.getItem('token',token);
+        let base64URL = token.split('.')[1];
+        let base64 = base64URL.replace('-','+').replace('_','/')
+        let decrypt = JSON.parse(window.atob(base64));
+        axios.get(`http://localhost:8000/api/personas/${decrypt.sub}/?token=`+token, {headers: {'X-Requested-With': 'XMLHttpRequest'}})
+            .then((response)=> {
+                if(response.status==200) {
+                  this.persona = response.data;
+                  
+
+                }
+            })
+            .catch(function(err) {
+                console.log(err);
+            })
+        axios.get(`http://localhost:8000/api/personaProfesional/${decrypt.sub}`).then(res => {
+            if(res.data.length != 0){
+                this.prof= true;
+                this.profesional=res.data[0]
+                console.log(this.profesional.id)
+                this.isloaded=true
+            }
+        }).catch(function(err) {
+                console.log(err);
+        })        
+        //this.$refs.form.validate()
+      }
 
     },
     }
