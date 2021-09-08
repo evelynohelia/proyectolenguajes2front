@@ -1,7 +1,6 @@
 <template lang="html">
 
   <section class="Disponibilidad">
-    
     <v-container class="grey lighten-5" >
     <v-row no-gutters >
       <v-col
@@ -21,7 +20,7 @@
       persistent
       max-width="600px"
     >
-      <template v-if=isProfe v-slot:activator="{ on, attrs }">
+      <template v-if=isProfes v-slot:activator="{ on, attrs }">
         <v-btn
           color="primary"
           dark
@@ -40,7 +39,7 @@
             
               
               <v-banner
-      v-model="v0"
+      
       single-line
       transition="slide-y-transition"
       font:
@@ -94,7 +93,7 @@
         </v-date-picker>
       </v-menu>
       <v-banner
-      v-model="v0"
+      
       single-line
       transition="slide-y-transition"
       font:
@@ -174,7 +173,7 @@
   </v-row>
   
     <v-banner
-      v-model="v0"
+      
       single-line
       transition="slide-y-transition"
       font:
@@ -188,7 +187,7 @@
 
     <v-text-field
             v-model="Descripcion"
-            :rules="nameRules"
+            
             :counter="50"
             label="Descripcion"
             required
@@ -198,7 +197,7 @@
 
     <v-text-field
             v-model="precio"
-            :rules="nameRules"
+            
             :counter="3"
             label="Precio"
             required
@@ -234,7 +233,7 @@
 
     </v-row>
   <!--aqui termia la parte de arriba del componente-->
-  <v-space></v-space>
+  <v-spacer></v-spacer>
   <h4 class= "cabecerad">Dias disponibles</h4> 
 
     
@@ -248,7 +247,7 @@
       <v-row  v-for="dia in dayss" :key="dia" >
 
       <v-card v-if="dias.has(dia)"><h1 class="dia">{{dia}}</h1></v-card>
-      <div  class="tarjetas" v-for="hora in dias.get(dia) " :key="hora" align="center"
+      <div  class="tarjetas" v-for="hora in dias.get(dia) " :key="hora.dia" align="center"
       justify="center">
         
         
@@ -274,15 +273,18 @@
               <h3>Dia: {{hora.dia}}</h3>
               <h3>Hora inicio: {{hora.horaini}}</h3>
               <h3>Hora Fin: {{hora.horafin}}</h3>
+              <h3>Descripcion: {{hora.descripcion}}</h3>
+              <h3>Precio: {{hora.precio}}</h3>
             </v-card-text>
             <v-card-actions class="justify-end">
-               <v-btn v-if=isProfe
+               <v-btn v-if=isProfes
                 text
                 v-on:click="borrarTurno(hora.id)"
                 @click="dialog.value = false"
               >Borrar</v-btn>
-              <v-btn v-if=!isProfe
+              <v-btn v-if=!isProfes
                 text
+                v-on:click="agregarCita({idturno:hora.id,descripcion:hora.descripcion,})"
                 @click="dialog.value = false"
               >Agendar Cita</v-btn>
               <v-btn
@@ -335,15 +337,105 @@
 </template>
 
 <script lang="js">
-
   export default  {
     
     name: 'Disponibilidad',
-    props: [],
+    props: { isProfes:Boolean,idProfesional:Number},
     mounted () {
-      const axios = require('axios').default;
+      
+        this.idusuario=this.idProfesional
+        console.log(this.idProfesional)
+      
+      this.cargarTurnos()
+    },
+    data: ()=>({
+      dialog:false,
+      dayss : ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado','Domingo'],
+      picker: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+      time: [],
+      idusuario:0,
+      date:"",
+      Descripcion:"",
+      precio:"",
+      isProfe:true,
+      dias:new Map(),
+      info:null,
+      time2:null,
+      menudate:false,
+        menu2: false,
+        menu3:false,
+        modal2: false,
+        turnos:[
+          
+        ],
+    }),
+    methods: {
+      
+      borrarTurno: function (event) {
+        let axios = require('axios').default;
+         axios.delete('http://127.0.0.1:8000/api/turnos/'+event).then(res=>{
+          this.cargarTurnos()
+          console.log(res)
+         })
+    },
+    agregarTurno: function(event){
+      //^[0-9]{1,3}$
+        console.log(event)
+        if(event.horaini>event.horafin || !event.fecha || !event.horaini|| !event.horafin || !event.descripcion || !/^[0-9]{1,3}$/.test(event.Precio) | event.descripcion.length>50){
+          alert("Los datos no estan digitados correctamente")
+        }
+        else{
+           let inicio = new Date(event.fecha+ ' ' + event.horaini)
+           console.log(inicio)
+           inicio=this.toIsoString(inicio).slice(0, 19).replace('T', ' ');
+           let fin = new Date(event.fecha+ ' ' + event.horafin);
+           fin= this.toIsoString(fin).slice(0, 19).replace('T', ' ');
+         console.log(inicio)
+          
+          let axios = require('axios').default;
+         axios.post('http://127.0.0.1:8000/api/servicios',{descripcion:event.descripcion,precio:event.Precio,profesional_id:this.idusuario}).then(response=>{
+           console.log(response.data)
+           axios.post('http://127.0.0.1:8000/api/turnos',{fecha_inicio:inicio,fecha_fin:fin,id_servicio:response.data.id,estado:true}).then(res=>{
+          this.cargarTurnos()
+          console.log(res)
+         })
+         })
+        }
+},
+    agregarCita: function(event){
+      console.log(event)
+      let axios = require('axios').default;
+      axios.post('http://127.0.0.1:8000/api/citas',{id_turno:event.idturno,id_cliente:1,descripcion:event.descripcion,estado:"Pendiente",acceso_cliente	:true,acceso_profesional:true}).then(
+        response=>{
+          console.log(response)
+          axios.put('http://127.0.0.1:8000/api/turnos/'+event.idturno,{estado:false}).then(res=>{
+          this.cargarTurnos()
+          console.log(res)
+         })
+        }
+      )
+    },
+    toIsoString :function(date) {
+  var tzo = -date.getTimezoneOffset(),
+      dif = tzo >= 0 ? '+' : '-',
+      pad = function(num) {
+          var norm = Math.floor(Math.abs(num));
+          return (norm < 10 ? '0' : '') + norm;
+      };
+
+  return date.getFullYear() +
+      '-' + pad(date.getMonth() + 1) +
+      '-' + pad(date.getDate()) +
+      'T' + pad(date.getHours()) +
+      ':' + pad(date.getMinutes()) +
+      ':' + pad(date.getSeconds()) +
+      dif + pad(tzo / 60) +
+      ':' + pad(tzo % 60);
+},
+  cargarTurnos :function(){
+    const axios = require('axios').default;
       axios
-      .get('http://127.0.0.1:8000/api/turnos')
+      .get('http://127.0.0.1:8000/api/turnos/profesionales/'+this.idusuario)
       .then(response => {
         let listadias=[];
         let diasmap=new Map()
@@ -351,6 +443,7 @@
         console.log(response.data)
         if(Array.isArray(response.data)){
           response.data.forEach(element => {
+          
           let fechaini=new Date();
           fechaini.setTime(Date.parse(element.fecha_inicio));
           let fechafin=new Date()
@@ -366,20 +459,23 @@
             id:element.id,
             dia:dayName,
             horaini: horaini1,
-            horafin:horafin1
+            horafin:horafin1,
+            descripcion:element.descripcion,
+            precio:element.precio
           }
-          if(!diasmap.has(dayName)){
+          if(!diasmap.has(dayName) && element.estado!=0){
             console.log(dayName)
             diasmap.set(dayName, [])
             diasmap.get(dayName).push(dia)
           }
           else{
-            diasmap.get(dayName).push(dia)
-
+            if(element.estado!=0){
+              diasmap.get(dayName).push(dia)
+            }
+            
           }
           
           listadias.push(dia)
-
         }
         );
         }
@@ -409,75 +505,27 @@
           }
           else{
             diasmap.get(dayName).push(dia)
-
           }
           
           listadias.push(dia)
         }
         
-
-
         
         
         console.log(diasmap)
         console.log(listadias)
         this.dias=diasmap
         this.turnos = listadias})
-    },
-    data: ()=>({
-      dialog:false,
-      dayss : ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado','Domingo'],
-      picker: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
-      time: [],
-      isProfe:true,
-      dias:new Map(),
-      info:null,
-      time2:null,
-      menudate:false,
-        menu2: false,
-        menu3:false,
-        modal2: false,
-        turnos:[
-          
-        ],
-    }),
-    methods: {
-      
-      borrarTurno: function (event) {
-        let axios = require('axios').default;
-         axios.delete('http://127.0.0.1:8000/api/turnos/'+event)
-    },
-    agregarTurno: function(event){
-      //^[0-9]{1,3}$
-        console.log(event)
-        if(event.horaini>event.horafin || !event.fecha || !event.horaini|| !event.horafin || !event.descripcion || !/^[0-9]{1,3}$/.test(event.Precio) | event.descripcion.length>50){
-          alert("Los datos no estan digitados correctamente")
-        }
-        else{
-           let inicio = new Date(event.fecha+ ' ' + event.horaini).toISOString().slice(0, 19).replace('T', ' ');
-           let fin = new Date(event.fecha+ ' ' + event.horafin).toISOString().slice(0, 19).replace('T', ' ');
-         console.log(inicio)
-          
-          let axios = require('axios').default;
-         axios.post('http://127.0.0.1:8000/api/servicios',{descripcion:event.descripcion,precio:event.Precio,profesional_id:9}).then(response=>{
-           console.log(response.data)
-           axios.post('http://127.0.0.1:8000/api/turnos',{fecha_inicio:inicio,fecha_fin:fin,id_servicio:response.data.id,estado:true})
-         })
-        }
-}
+  }
       
     },
     computed: {
-
     },
 }
-
-
 </script>
 
 <style scoped lang="scss">
   .Disponibilidad {
-
   }
   .cabecerad{
     margin-top: 1rem;

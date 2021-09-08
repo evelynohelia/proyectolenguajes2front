@@ -1,6 +1,7 @@
 <template>
   <div class="root">
     <Navegacion></Navegacion>
+    <div v-if="!prof">
     <v-container class="d-flex justify-center mt-5">
           <v-col
       col="12"
@@ -39,13 +40,20 @@
         </ProfCard>
       </v-row>
     </v-container>
-  </div>
+    </div>
+    <div v-else>
+      <Disponibilidad v-bind:idProfesional="id" v-bind:isProfes="prof"></Disponibilidad>
+    </div>
+    </div>
 </template>
+
+
 
 <script>
 
   import Navegacion from '../components/Navegacion.vue';
   import ProfCard from '../components/ProfCard.vue';
+  import Disponibilidad from '../components/Disponibilidad.vue';
   import axios from 'axios';
   export default {
     name: 'Home',
@@ -54,20 +62,20 @@
         personas:{},
         profesionales: [],
         load : false,
-        buscarInput: ""
+        buscarInput: "",
+        prof: false,
+        id: 0,
       }
     },
     components:{
       Navegacion,
-      ProfCard
+      ProfCard,
+      Disponibilidad
     },
     mounted(){
       this.getPersonas();
-      axios.get("http://localhost:8000/api/profRecomendados").then(response => {
-          this.profesionales = response.data;
-          console.log(this.profesionales)
-          this.load = true;
-        })
+      this.checkProf();
+
     },
 
     methods:{
@@ -92,6 +100,43 @@
         
         //this.$refs.form.validate()
       },
+      checkProf(){
+        let token = localStorage.getItem('token',token);
+        if(token === null){
+            this.$router.push('login')
+        }else{
+            axios.get('http://localhost:8000/api/personas?token='+token, {headers: {'X-Requested-With': 'XMLHttpRequest'}})
+            .then((response) =>{
+                if(response.status!=200) {
+                  this.$router.push('login')
+
+                }
+            })
+            .catch(function(err) {
+                console.log(err);
+            })     
+        }
+        let base64URL = token.split('.')[1];
+
+        let base64 = base64URL.replace('-','+').replace('_','/')
+        let decrypt = JSON.parse(window.atob(base64));
+        this.id = decrypt.sub;
+        axios.get(`http://localhost:8000/api/personaProfesional/${decrypt.sub}`).then(res => {
+            if(res.data.length != 0){
+                this.prof= true;
+                this.id = res.data[0].id;
+            }
+            else{
+                axios.get("http://localhost:8000/api/profRecomendados").then(response => {
+            this.profesionales = response.data;
+            console.log(this.profesionales)
+            this.load = true;
+        })
+            }
+        }).catch(function(err) {
+                console.log(err);
+        })  
+      }
     },
     }
 </script>

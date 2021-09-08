@@ -31,7 +31,10 @@
         </v-row>
         <v-container class="mt-2">
             <div v-if="desc" >Descripcion</div>
-            <div v-if="disp" >Disponibilidad</div>
+            <div v-if="disp" >
+                <Disponibilidad v-if="isloaded" :isProfes="bol" :idProfesional="idprofe"></Disponibilidad>
+
+            </div>
         </v-container>
     </div>
 </template>
@@ -39,23 +42,37 @@
 <script>
 import Navegacion from "../components/Navegacion.vue";
 import axios from 'axios';
+import Disponibilidad from '../components/Disponibilidad.vue';
 export default {
     name: 'Profile',
     components: {
         Navegacion,
+        Disponibilidad,
 
     },
     data(){
         return{
             desc: true,
             disp : false,
-            persona: {}
+            persona: {},
+            bol:false,
+            idprofe:0,
+            isloaded:false
+            
         };
     },
     mounted(){
         axios.get(`http://localhost:8000/api/personaProfesional/${this.$route.params.id}`).then(response => {
             this.persona = response.data[0];
+            this.idprofe=response.data[0].id;
+            this.isloaded=true;
+
+
         })
+    }
+    ,
+    methods:{
+        
     }
 }
 </script>

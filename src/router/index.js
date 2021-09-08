@@ -24,6 +24,11 @@ const routes = [
     component : () => import(/* webpackChunkName: "about" */ '../views/Login.vue')
   },
   {
+    path:'/register',
+    name: 'Register',
+    component : () => import(/* webpackChunkName: "about" */ '../views/Registro.vue')
+  },
+  {
     path:'/profile',
     name: 'Profile',
     component : () => import(/* webpackChunkName: "about"*/'../views/Profile.vue')
@@ -42,6 +47,11 @@ const routes = [
     path:'/search/',
     name:'Busqueda',
     component : () => import(/* webpackChunkName: "about"*/'../views/Search.vue')
+  },
+  {
+    path:'/disponibilidad',
+    name:'DisponibilidadView',
+    component : () => import(/* webpackChunkName: "about"*/'../views/DisponibilidadView.vue')
   },
   {
     path:'/historial/:id',
