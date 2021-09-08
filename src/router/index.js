@@ -29,9 +29,27 @@ const routes = [
     component : () => import(/* webpackChunkName: "about"*/'../views/Profile.vue')
   },
   {
-    path:'/profesional',
+    path:'/profesional/:id',
     name: 'Profesional',
     component : () => import(/* webpackChunkName: "about"*/'../views/Profesional.vue')
+  },
+  {
+    path:'/search/:data',
+    name:'Busqueda',
+    component : () => import(/* webpackChunkName: "about"*/'../views/Search.vue')
+  },
+  {
+    path:'/search/',
+    name:'Busqueda',
+    component : () => import(/* webpackChunkName: "about"*/'../views/Search.vue')
+  },
+  {
+    path:'/historial/:id',
+    name: 'historial',
+    component : () => import(/* webpackChunkName: "about"*/'../views/Historial.vue'),
+    props: {
+      default: true
+    }
   }
 ]
 

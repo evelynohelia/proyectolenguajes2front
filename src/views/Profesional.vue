@@ -15,7 +15,7 @@
                 cols="12"
                 md="10"                
             >
-                <h3>Nombre del profesional</h3>
+                <h3>{{persona.persona.nombres}} {{persona.persona.apellidos}}</h3>
                 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam varius enim vel euismod dapibus. Mauris gravida consectetur enim. Donec dapibus ipsum metus, et placerat nisi suscipit vel. Aliquam erat volutpat. Ut ligula dui, volutpat et arcu feugiat, sagittis blandit neque. Phasellus suscipit lorem purus, quis consectetur nunc posuere vel. Nunc vulputate in quam eu imperdiet. Nunc iaculis lectus et lorem maximus molestie. Integer tempus massa et rutrum dictum. Integer pulvinar magna et est interdum blandit. Curabitur et orci ante.</p>
             
             </v-col>
@@ -38,6 +38,7 @@
 
 <script>
 import Navegacion from "../components/Navegacion.vue";
+import axios from 'axios';
 export default {
     name: 'Profile',
     components: {
@@ -47,8 +48,14 @@ export default {
     data(){
         return{
             desc: true,
-            disp : false
+            disp : false,
+            persona: {}
         };
+    },
+    mounted(){
+        axios.get(`http://localhost:8000/api/personaProfesional/${this.$route.params.id}`).then(response => {
+            this.persona = response.data[0];
+        })
     }
 }
 </script>
