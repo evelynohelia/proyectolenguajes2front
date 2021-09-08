@@ -1,7 +1,7 @@
 <template>
 <div class="root">
     <v-card class="flotante">
-        <v-card-title class="text-center justify-center pb-0">Login</v-card-title>
+        <v-card-title class="text-center justify-center pb-0">Register</v-card-title>
         <v-form v-model="valid">
             <v-container>
                 
@@ -106,7 +106,7 @@
                     color="success"
                     @click="validate"
                     >
-                    Login
+                    Register
                     </v-btn>  
                     <v-btn
                     @click="auth"
@@ -135,7 +135,7 @@ export default {
           username:'',
           nombres:'',
           apellidos:'',
-          fecha:''
+          fecha_nacimiento:''
         },
         user: {},
         authUser:{},
@@ -158,17 +158,12 @@ export default {
     {
       
       async validate () {
-        let _this=this;
-           await axios.post('http://localhost:8000/api/auth/login', this.credentials,{headers: {'X-Requested-With': 'XMLHttpRequest'}})
+          console.log(this.credentials)
+    
+           await axios.post('http://localhost:8000/api/auth/register', this.credentials,{headers: {'X-Requested-With': 'XMLHttpRequest'}})
             .then(function(response) {
                 if(response.status==200) {
-                  _this.user = response.data;
-                  let token = response.data.access_token;
-                  let base64URL = token.split('.')[1];
-                  let base64 = base64URL.replace('-','+').replace('_','/')
-                  console.log(JSON.parse(window.atob(base64)))
-                  localStorage.setItem('token',token);
-                  _this.$router.push({ name: 'Home', query: { redirect: '/' } });
+                  this.$router.push({ name: 'Login', query: { redirect: '/login' } });
                 }
             })
             .catch(function(err) {
