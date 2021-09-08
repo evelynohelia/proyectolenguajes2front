@@ -83,6 +83,7 @@
                 if(response.status==200) {
                   _this.personas=response.data; 
                   console.log(response.data);
+
                 }
             })
             .catch(function(err) {
