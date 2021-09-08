@@ -9,7 +9,7 @@
                 color="primary"
             >
                 <v-list-item
-                v-for="(cita, i) in citas"
+                v-for="(cita, i) in citasPendientesProfesional"
                 :key="i"
                 class="item-cita my-1"
                 >
@@ -33,6 +33,7 @@
                                 class="delete"
                                 color="error"
                                 plain
+                                @click="onAceptar(cita)"
                                 >
                                 Aceptar
                             </v-btn>
@@ -40,6 +41,7 @@
                                 class="delete"
                                 color="primary"
                                 plain
+                                @click="onRechazar(cita)"
                                 >
                                 Rechazar
                             </v-btn>
@@ -105,8 +107,53 @@ export default {
       this.getHistorial()
     },
 
+    computed: {
+       citasPendientesProfesional(){
+          if(this.citas){
+            let result = this.citas.filter(cita => cita.estado == "Pendiente");
+            return result
+          }
+        return [];
+      }
+    },
+
     methods:{
-        
+        onAceptar(cita){
+            let _this = this;
+            axios.post('http://localhost:8000/api/changeStatusCitas/'+ cita.id,
+            {'status': 'Aceptado'}
+            )
+            .then(function(res) {
+                if(res.status==200) {
+                   console.log(res);
+                    _this.dialogCancelCita = false
+                    _this.dialog = false
+                    _this.getHistorial()
+                }
+            })
+            .catch(function(err) {
+                console.log(err);
+            })
+
+        },
+        onRechazar(cita){
+            let _this = this;
+            axios.post('http://localhost:8000/api/changeStatusCitas/'+ cita.id,
+            {'status': 'Rechazado'}
+            )
+            .then(function(res) {
+                if(res.status==200) {
+                   console.log(res);
+                    _this.dialogCancelCita = false
+                    _this.dialog = false
+                    _this.getHistorial()
+                }
+            })
+            .catch(function(err) {
+                console.log(err);
+            })
+
+        },     
         getHistorial(){
             let _this = this;
             axios.get('http://localhost:8000/api/cliente/citas/'+ _this.idPersona)
